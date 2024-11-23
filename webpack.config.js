@@ -1,31 +1,41 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: './src/main.js',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    clean: true
+    clean: true,
+    publicPath: '/'
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html', // Use your custom HTML file
-      inject: 'body', // Inject the script tag into the body
+      template: path.resolve(__dirname, 'src', 'index.html'),
+      inject: 'body',
+    }),
+    new CopyPlugin({
+      patterns: [
+        { from: "src/assets", to: "assets" }
+      ],
     }),
   ],
   module: {
     rules: [
       {
-        test: /\.(png|jpg|gif|svg)$/, // Enable importing images
+        test: /\.(png|jpg|gif|svg)$/,
         type: 'asset/resource',
+        generator: {
+          filename: 'assets/textures/[name][ext]',
+        },
       },
     ],
   },
   devServer: {
-    static: './dist',
+    static: path.resolve(__dirname, 'dist'),
     port: 3000,
     hot: true
   },
-  mode: 'development', // Change to 'production' for builds
+  mode: 'development',
 };
