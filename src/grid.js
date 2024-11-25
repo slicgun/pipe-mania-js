@@ -1,4 +1,4 @@
-import { Graphics } from 'pixi.js';
+import { Graphics, Sprite } from 'pixi.js';
 import { Cell, CellType, originalSize, cellSize } from './cell.js';
 import { setupSprite } from './utils.js';
 
@@ -10,6 +10,23 @@ export class Grid {
         this.size = { x: 9, y: 7 };
         this.cells = [];
         this.#setupGrid(stageInterface, cellClickCallback);
+
+        let numBlocked = 3;
+
+        for (let i = 0; i < numBlocked; i++) {
+            const gridPos = {
+                x: Math.floor(Math.random() * this.size.x),
+                y: Math.floor(Math.random() * this.size.y)
+            };
+            this.#setCell(gridPos, CellType.blocked, stageInterface);
+        }
+
+        const startPos = {
+            x: Math.floor(Math.random() * this.size.x),
+            y: Math.floor(Math.random() * (this.size.y - 1))
+        };
+
+        this.#setCell(startPos, CellType.start, stageInterface);
     }
 
     #setupGrid(stageInterface, cellClickCallback) {
@@ -34,5 +51,18 @@ export class Grid {
 
         stageInterface.addToStage(sprite);
         this.cells.push(cell);
+    }
+
+    #setCell(gridPosition, newType, stageInterface) {
+        const cell = this.cells[gridPosition.x + gridPosition.y * this.size.x];
+        const sprite = cell.sprite;
+        cell.type = newType;
+        stageInterface.removeFromStage(sprite);
+
+        const screenPos = { x: sprite.position.x, y: sprite.position.y };
+
+        cell.sprite = Sprite.from(cell.type);
+        setupSprite(cell.sprite, screenPos);
+        stageInterface.addToStage(cell.sprite);
     }
 }

@@ -26,6 +26,8 @@ export class Game {
         assets.push({ alias: 'pipe', src: 'assets/textures/pipe.png' });
         assets.push({ alias: 'cross', src: 'assets/textures/cross.png' });
         assets.push({ alias: 'curved', src: 'assets/textures/curved.png' });
+        assets.push({ alias: 'blocked', src: 'assets/textures/blocked.png' });
+        assets.push({ alias: 'start', src: 'assets/textures/start.png' });
         await Assets.load(assets);
     }
 
