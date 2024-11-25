@@ -30,7 +30,7 @@ export class Cell {
         const oldScreenPos = { x: this.sprite.position.x, y: this.sprite.position.y };
         this.stageInterface.removeFromStage(this.sprite);
         this.sprite = Sprite.from(pipe.type);
-        setupSprite(this.sprite, oldScreenPos);
+        setupSprite(this.sprite, oldScreenPos, pipe.rotation);
         this.sprite.on('pointerdown', this.onClick.bind(this));
         this.stageInterface.addToStage(this.sprite);
         //console.log(pipe);
