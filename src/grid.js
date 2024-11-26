@@ -5,14 +5,15 @@ import { setupSprite } from './utils.js';
 
 
 export class Grid {
-    constructor(stageInterface, xPos, yPos, cellClickCallback) {
+    constructor(stageInterface, xPos, yPos, callbacks) {
         this.position = { x: xPos, y: yPos };
         this.size = { x: 9, y: 7 };
         this.cells = [];
-        this.#setupGrid(stageInterface, cellClickCallback);
+        this.#setupGrid(stageInterface, callbacks);
 
         let numBlocked = 3;
 
+        //fix this
         for (let i = 0; i < numBlocked; i++) {
             const gridPos = {
                 x: Math.floor(Math.random() * this.size.x),
@@ -21,15 +22,25 @@ export class Grid {
             this.#setCell(gridPos, CellType.blocked, stageInterface);
         }
 
-        const startPos = {
+        this.startPos = {
             x: Math.floor(Math.random() * this.size.x),
             y: Math.floor(Math.random() * (this.size.y - 1))
         };
 
-        this.#setCell(startPos, CellType.start, stageInterface);
+        this.#setCell(this.startPos, CellType.start, stageInterface);
+        const cell = this.getCell(this.startPos);
+        cell.openings = [0, 1, 0, 0];
     }
 
-    #setupGrid(stageInterface, cellClickCallback) {
+    getCell(gridPosition) {
+        if (gridPosition.x >= this.size.x || gridPosition.y >= this.size.y) {
+            console.log("out of bounds");
+            return undefined;
+        }
+        return this.cells[gridPosition.x + gridPosition.y * this.size.x];
+    }
+
+    #setupGrid(stageInterface, callbacks) {
         for (let y = 0; y < this.size.y; y++) {
             for (let x = 0; x < this.size.x; x++) {
                 let xOff = -cellSize * this.size.x * 0.5;
@@ -38,14 +49,14 @@ export class Grid {
                     x: this.position.x + x * (cellSize + 1) + xOff,
                     y: this.position.y + y * (cellSize + 1) + yOff
                 };
-                this.#addCell(stageInterface, screenPosition, {x: x, y: y}, cellClickCallback);
+                this.#addCell(stageInterface, screenPosition, {x: x, y: y}, callbacks);
             }
         }
 
     }
 
-    #addCell(stageInterface, screenPosition, gridPosition, cellClickCallback) {
-        const cell = new Cell(CellType.empty, gridPosition, stageInterface, cellClickCallback);
+    #addCell(stageInterface, screenPosition, gridPosition, callbacks) {
+        const cell = new Cell(CellType.empty, gridPosition, stageInterface, callbacks);
         const sprite = cell.sprite;
         setupSprite(sprite, screenPosition);
 
@@ -54,15 +65,7 @@ export class Grid {
     }
 
     #setCell(gridPosition, newType, stageInterface) {
-        const cell = this.cells[gridPosition.x + gridPosition.y * this.size.x];
-        const sprite = cell.sprite;
-        cell.type = newType;
-        stageInterface.removeFromStage(sprite);
-
-        const screenPos = { x: sprite.position.x, y: sprite.position.y };
-
-        cell.sprite = Sprite.from(cell.type);
-        setupSprite(cell.sprite, screenPos);
-        stageInterface.addToStage(cell.sprite);
+        const cell = this.getCell(gridPosition);
+        cell.setNewType(newType);
     }
 }

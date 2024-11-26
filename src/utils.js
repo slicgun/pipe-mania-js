@@ -1,6 +1,6 @@
 import { originalSize, cellSize } from './cell.js';
 
-const ToRadians = Math.PI / 180; 
+export const ToRadians = Math.PI / 180; 
 
 export function setupSprite(sprite, screenPosition, rotation = 0, scale = 1) {
     sprite.anchor.set(0.5);

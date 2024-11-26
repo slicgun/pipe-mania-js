@@ -2,22 +2,36 @@ import { Application, Assets, Sprite } from 'pixi.js';
 import { PipeGenerator } from './pipeGenerator';
 import { Grid } from './grid.js';
 import { StageInterface } from './stageInterface.js';
+import { WaterManager } from './waterManager.js';
 
 export class Game {
+    static isPlaying = false;
+
     constructor() {
         this.app = new Application();
     }
     
     async init() {
         await this.#loadAssets();
-        await this.app.init({ background: '#1099bb', resizeTo: window });
+        await this.app.init({ background: '#722F37', resizeTo: window });
         document.body.appendChild(this.app.canvas);
         
         this.pipeGenerator = new PipeGenerator(this);
         this.stageInterface = new StageInterface(this.app.stage);
+        this.waterManager = new WaterManager();
+
+        const callbacks = {
+            firstPipePlaced: this.waterManager.beginFlow.bind(this.waterManager),
+            addToWaterManager: this.waterManager.addCell.bind(this.waterManager),
+            getNextPipe: this.pipeGenerator.getNextPipe.bind(this.pipeGenerator),
+        };
+
         this.grid = new Grid(this.stageInterface,
             this.app.screen.width / 2, this.app.screen.height / 2,
-            this.pipeGenerator.getNextPipe.bind(this.pipeGenerator));
+            callbacks);
+        
+        this.waterManager.startCell = this.grid.getCell(this.grid.startPos);
+        this.waterManager.grid = this.grid;
     }
 
     async #loadAssets() {

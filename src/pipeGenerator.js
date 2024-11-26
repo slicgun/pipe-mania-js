@@ -1,5 +1,5 @@
 import { Sprite } from "pixi.js";
-import { cellSize } from "./cell";
+import { cellSize, CellType } from "./cell";
 import { setupSprite } from "./utils";
 
 
@@ -15,6 +15,7 @@ export class PipeGenerator {
         this.#displayScale = 2;
         this.#pipesToShow = 4;
         this.#pipeChoices = ['pipe', 'curved', 'cross'];
+        //this.#pipeChoices = ['cross'];
         this.#game = game;
         this.#nextPipes = [];
 
@@ -39,11 +40,42 @@ export class PipeGenerator {
     }
 
     #generatePipe() {
-        const rotation = (Math.floor(Math.random() * 4) + 1) * 90;
-        const type = Math.floor(Math.random() * this.#pipeChoices.length);
+        const rotation = (Math.floor(Math.random() * 4)) * 90;
+        const type = this.#pipeChoices[Math.floor(Math.random() * this.#pipeChoices.length)];
+
+        // [up, down, left, right], 0 means no opening
+        let openings = [0, 0, 0, 0];
+
+        if (type === CellType.cross) {
+            openings = [1, 1, 1, 1];
+        }
+        else if (type === CellType.pipe) {
+            if (rotation === 0 || rotation === 180) {
+                openings = [1, 1, 0, 0];
+            }
+            else if (rotation === 90 || rotation === 270) {
+                openings = [0, 0, 1, 1];
+            }
+        }
+        else {
+            if (rotation === 0) {
+                openings = [1, 0, 0, 1];
+            }
+            else if (rotation === 90) {
+                openings = [0, 1, 0, 1];
+            }
+            else if (rotation === 180) {
+                openings = [0, 1, 1, 0];
+            }
+            else if (rotation === 270) {
+                openings = [1, 0, 1, 0];
+            }
+        }
+
         const pipe = {
-            type: this.#pipeChoices[type],
-            rotation: rotation
+            type: type,
+            rotation: rotation,
+            openings: openings
         };
         return pipe;
     }
