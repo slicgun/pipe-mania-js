@@ -1,6 +1,4 @@
 import { CellType } from "./cell";
-import { createText, ToRadians } from "./utils";
-
 
 export class WaterManager {
     #sources;
