@@ -2,21 +2,24 @@ import { Sprite } from "pixi.js";
 import { cellSize, CellType } from "./cell";
 import { setupSprite } from "./utils";
 
+const screenWidthRatio = 0.05;
+const screenHeightRatio = 0.6;
+const displayOffset = 16;
 
 export class PipeGenerator {
     #pipeChoices;
-    #game;
     #nextPipes;
     #displaySprites;
     #pipesToShow;
     #displayScale;
+    #stageInterface;
 
-    constructor(game) {
+    constructor(screenWidth, screenHeight, stageInterface) {
         this.#displayScale = 2;
         this.#pipesToShow = 4;
-        this.#pipeChoices = ['pipe', 'curved', 'cross'];
-        //this.#pipeChoices = ['cross'];
-        this.#game = game;
+        //this.#pipeChoices = ['pipe', 'curved', 'cross'];
+        this.#pipeChoices = ['cross'];
+        this.#stageInterface = stageInterface;
         this.#nextPipes = [];
 
         for (let i = 0; i < this.#pipesToShow; i++) {
@@ -30,15 +33,16 @@ export class PipeGenerator {
             const pipe = this.#nextPipes[i];
             const sprite = Sprite.from(pipe.type);
             const screenPosition = {
-                x: this.#game.app.screen.width * 0.05,
-                y: this.#game.app.screen.height * 0.6 - (i * this.#displayScale * cellSize) - (i * offset)
+                x: screenWidth * screenWidthRatio,
+                y: screenHeight * screenHeightRatio - (i * this.#displayScale * cellSize) - (i * displayOffset)
             };
             setupSprite(sprite, screenPosition, pipe.rotation, this.#displayScale);
-            this.#game.app.stage.addChild(sprite);
+            this.#stageInterface.addToStage(sprite);
             this.#displaySprites.push(sprite);
         }
     }
 
+    //need to improve this
     #generatePipe() {
         const rotation = (Math.floor(Math.random() * 4)) * 90;
         const type = this.#pipeChoices[Math.floor(Math.random() * this.#pipeChoices.length)];
@@ -83,7 +87,7 @@ export class PipeGenerator {
     #updateDisplay() {
         const toRemove = this.#displaySprites.shift()
         let screenPos = { x: toRemove.position.x, y: toRemove.position.y };
-        this.#game.app.stage.removeChild(toRemove);
+        this.#stageInterface.removeFromStage(toRemove);
         for (let sprite of this.#displaySprites) {
             let oldScreenPos = { x: sprite.position.x, y: sprite.position.y };
             sprite.position.x = screenPos.x;
@@ -93,7 +97,7 @@ export class PipeGenerator {
         const nextPipe = this.#nextPipes[this.#nextPipes.length - 1];
         const sprite = Sprite.from(nextPipe.type);
         setupSprite(sprite, screenPos, nextPipe.rotation, this.#displayScale);
-        this.#game.app.stage.addChild(sprite);
+        this.#stageInterface.addToStage(sprite);
         this.#displaySprites.push(sprite);
     }
 
