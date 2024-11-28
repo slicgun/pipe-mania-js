@@ -13,6 +13,23 @@ export class Grid {
         this.#cells = [];
         this.#setupGrid(stageInterface, callbacks);
 
+        this.#addStartCell(stageInterface);
+        this.#addBlockedCells(stageInterface);
+    }
+
+    getStartPosition() {
+        return this.#startPos;
+    }
+
+    getCell(gridPosition) {
+        if (gridPosition.x >= this.#size.x || gridPosition.y >= this.#size.y) {
+            console.log("out of bounds");
+            return undefined;
+        }
+        return this.#cells[gridPosition.x + gridPosition.y * this.#size.x];
+    }
+
+    #addStartCell(stageInterface) {
         this.#startPos = {
             x: Math.floor(Math.random() * this.#size.x),
             y: Math.floor(Math.random() * (this.#size.y - 1))
@@ -21,7 +38,9 @@ export class Grid {
         this.#setCell(this.#startPos, CellType.start, stageInterface);
         const cell = this.getCell(this.#startPos);
         cell.openings = [0, 1, 0, 0];
+    }
 
+    #addBlockedCells(stageInterface) {
         let numBlocked = 3;
         for (let i = 0; i < numBlocked; i++) {
             let gridPos = {
@@ -37,18 +56,6 @@ export class Grid {
             }
             this.#setCell(gridPos, CellType.blocked, stageInterface);
         }
-    }
-
-    getStartPosition() {
-        return this.#startPos;
-    }
-
-    getCell(gridPosition) {
-        if (gridPosition.x >= this.#size.x || gridPosition.y >= this.#size.y) {
-            console.log("out of bounds");
-            return undefined;
-        }
-        return this.#cells[gridPosition.x + gridPosition.y * this.#size.x];
     }
 
     #setupGrid(stageInterface, callbacks) {
@@ -69,6 +76,7 @@ export class Grid {
     #addCell(stageInterface, screenPosition, gridPosition, callbacks) {
         const cell = new Cell(CellType.empty, gridPosition, stageInterface, callbacks);
         const sprite = cell.getSprite();
+        console.log(sprite.position);
         setupSprite(sprite, screenPosition);
 
         stageInterface.addToStage(sprite);

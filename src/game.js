@@ -11,9 +11,6 @@ export class Game {
     #stageInterface;
     #waterManager;
     #grid;
-    #resultText;
-    #scoreText;
-    #goalText;
     #ui;
 
     static isPlaying = false;
@@ -26,7 +23,9 @@ export class Game {
         await this.#loadAssets();
         await this.#app.init({ background: '#722F37', resizeTo: window });
         document.body.appendChild(this.#app.canvas);
+    }
 
+    startGame() {
         const waterManagerCallbacks = {
             onGameEnd: this.onGameFinish.bind(this),
             onTick: this.updateScore.bind(this)
@@ -39,9 +38,17 @@ export class Game {
         this.#pipeGenerator = new PipeGenerator(screenWidth, screenHeight, this.#stageInterface);
         this.#waterManager = new WaterManager(waterManagerCallbacks, screenWidth, screenHeight);
 
-        this.#initGrid();
+        const gridCallbacks = {
+            firstPipePlaced: this.#waterManager.beginFlow.bind(this.#waterManager),
+            addToWaterManager: this.#waterManager.checkForSourceConnections.bind(this.#waterManager),
+            getNextPipe: this.#pipeGenerator.getNextPipe.bind(this.#pipeGenerator),
+        };
+
+        this.#grid = new Grid(this.#stageInterface,
+            this.#app.screen.width / 2, this.#app.screen.height / 2,
+            gridCallbacks);
+        
         this.#ui = new UI(screenWidth, screenHeight, this.#stageInterface, this.#waterManager.getGoal());
-        //this.#initUI();
         
         this.#waterManager.startCell = this.#grid.getCell(this.#grid.getStartPosition());
         this.#waterManager.grid = this.#grid;
@@ -70,17 +77,5 @@ export class Game {
 
     onGameFinish(win) {
         this.#ui.showResult(win);
-    }
-
-    #initGrid() {
-        const gridCallbacks = {
-            firstPipePlaced: this.#waterManager.beginFlow.bind(this.#waterManager),
-            addToWaterManager: this.#waterManager.checkForSourceConnections.bind(this.#waterManager),
-            getNextPipe: this.#pipeGenerator.getNextPipe.bind(this.#pipeGenerator),
-        };
-
-        this.#grid = new Grid(this.#stageInterface,
-            this.#app.screen.width / 2, this.#app.screen.height / 2,
-            gridCallbacks);
     }
 }

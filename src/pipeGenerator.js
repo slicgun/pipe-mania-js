@@ -17,17 +17,19 @@ export class PipeGenerator {
     constructor(screenWidth, screenHeight, stageInterface) {
         this.#displayScale = 2;
         this.#pipesToShow = 4;
-        //this.#pipeChoices = ['pipe', 'curved', 'cross'];
-        this.#pipeChoices = ['cross'];
+        this.#pipeChoices = ['pipe', 'curved', 'cross'];
         this.#stageInterface = stageInterface;
-        this.#nextPipes = [];
 
+        this.#init(screenWidth, screenHeight);
+    }
+
+    #init(screenWidth, screenHeight) {
+        this.#nextPipes = [];
         for (let i = 0; i < this.#pipesToShow; i++) {
             this.#nextPipes.push(this.#generatePipe());
         }
 
         //set up the display
-        let offset = 16;
         this.#displaySprites = [];
         for (let i = 0; i < this.#pipesToShow; i++) {
             const pipe = this.#nextPipes[i];

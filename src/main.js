@@ -4,9 +4,5 @@ import { Game } from './game.js';
 {
     const game = new Game();
     await game.init();
+    game.startGame();
 })();
-
-// todo:
-// add the gameplay loop
-// add the animations
-// clean up code

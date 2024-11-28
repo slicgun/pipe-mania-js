@@ -49,19 +49,19 @@ export class WaterManager {
             this.startCell.addWater();
             this.startCell.setFull();
             this.#sources.push(this.startCell);
-            this.#intervalId = setInterval(this.calculateFlow.bind(this), 1000);
+            this.#intervalId = setInterval(this.#calculateFlow.bind(this), 1000);
         }, 1000);
         
     }
 
-    calculateFlow() {
+    #calculateFlow() {
         if (this.#sources.length === 0 || this.#endGame) {
             clearInterval(this.#intervalId);
             this.#onGameEndCallback(this.#longestPath >= this.#goal);
             return;
         }
 
-        this.#longestPath = this.findLongestPath();
+        this.#longestPath = this.#findLongestPath();
 
         if (this.#longestPath >= this.#goal) {
             this.#endGame = true;
@@ -136,7 +136,7 @@ export class WaterManager {
         return longestPath;
     }
 
-    findLongestPath() {
+    #findLongestPath() {
         this.#visitedCells.clear();
         return this.#dfs(this.startCell, 0);
     }

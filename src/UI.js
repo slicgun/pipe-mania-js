@@ -47,10 +47,10 @@ export class UI {
 
     showResult(win) {
         if (win) {
-            this.#resultText.text = "you win!";
+            this.#resultText.text = "you win!\nrefresh the page to play again";
         }
         else {
-            this.#resultText.text = "you lose!";
+            this.#resultText.text = "you lose!\nrefresh the page to play again";
         }
         this.#stageInterface.addToStage(this.#resultText);
     }
